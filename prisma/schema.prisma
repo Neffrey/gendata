@@ -26,13 +26,13 @@ model Account {
     type                     String
     provider                 String
     providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
+    refresh_token            String?  @db.Text
+    access_token             String?  @db.Text
     refresh_token_expires_in Int?
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String?  @db.Text
     session_state            String?
     oauth_token_secret       String?
     oauth_token              String?
@@ -71,4 +71,34 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// Data Models
+model Category {
+    id       String  @id @default(cuid())
+    slug     String  @unique
+    name     String
+    items    Item[]
+    children Child[]
+}
+
+model Child {
+    id           String    @id @default(cuid())
+    itemId       String    @unique
+    parentCatId  String?   @unique
+    parentCat    Category? @relation(fields: [parentCatId], references: [id])
+    parentItemId String?   @unique
+    parentItem   Item?     @relation(fields: [parentItemId], references: [id])
+}
+
+model Item {
+    id         String   @id @default(cuid())
+    slug       String   @unique
+    name       String
+    rarity     String?
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id])
+    Children   Child[]
+
+    @@index([categoryId])
 }
